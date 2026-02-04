@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supered ROI Calculator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pink-primary: #FF1B8D;
+            --pink-bright: #FF69B4;
+            --pink-light: #FFB6D9;
+            --pink-pale: #FFF0F7;
+            --pink-glow: rgba(255, 27, 141, 0.15);
+            --dark: #1a1a2e;
+            --gray: #6B7280;
+            --white: #FFFFFF;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #fef5f9 0%, #fff0f7 50%, #ffe8f3 100%);
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            right: -20%;
+            width: 80%;
+            height: 80%;
+            background: radial-gradient(circle, var(--pink-glow) 0%, transparent 70%);
+            pointer-events: none;
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1) translateY(0); opacity: 0.6; }
+            50% { transform: scale(1.1) translateY(-20px); opacity: 0.8; }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: slideDown 0.8s ease-out;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .logo {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 3.5rem;
+            background: linear-gradient(135deg, var(--pink-primary) 0%, var(--pink-bright) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+            text-transform: uppercase;
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .calculator-card {
+            background: white;
+            border-radius: 24px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(255, 27, 141, 0.12);
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+        }
+
+        @keyframes fadeInUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .section {
+            margin-bottom: 2.5rem;
+        }
+
+        .section-header {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 1.5rem;
+            color: var(--pink-primary);
+            margin-bottom: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-icon {
+            font-size: 1.8rem;
+        }
+
+        .input-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        label {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+
+        input {
+            padding: 1rem 1.25rem;
+            border: 2px solid #f0f0f0;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: var(--pink-pale);
+            color: var(--dark);
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--pink-primary);
+            background: white;
+            box-shadow: 0 0 0 4px var(--pink-glow);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, var(--pink-primary) 0%, var(--pink-bright) 100%);
+            padding: 2rem;
+            border-radius: 16px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            animation: scaleIn 0.5s ease-out backwards;
+        }
+
+        .result-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0.9); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .result-label {
+            font-size: 0.9rem;
+            opacity: 0.95;
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-value {
+            font-family: 'Archivo Black', sans-serif;
+            font-size: 2.5rem;
+            position: relative;
+            z-index: 1;
+            line-height: 1;
+        }
+
+        .breakdown-table {
+            margin-top: 2rem;
+            background: var(--pink-pale);
+            border-radius: 16px;
+            padding: 1.5rem;
+            animation: fadeInUp 0.8s ease-out 0.4s backwards;
+        }
+
+        .breakdown-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 27, 141, 0.1);
+        }
+
+        .breakdown-row:last-child {
+            border-bottom: none;
+        }
+
+        .breakdown-label {
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .breakdown-value {
+            font-weight: 700;
+            color: var(--pink-primary);
+            font-size: 1.1rem;
+        }
+
+        .before-after {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .before-after-card {
+            background: white;
+            padding: 1.25rem;
+            border-radius: 12px;
+            border: 2px solid #f0f0f0;
+        }
+
+        .before-after-label {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .before-after-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+
+        .cta-section {
+            margin-top: 3rem;
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--pink-primary) 0%, var(--pink-bright) 100%);
+            border-radius: 16px;
+            color: white;
+            animation: fadeInUp 0.8s ease-out 0.6s backwards;
+        }
+
+        .cta-text {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: white;
+            color: var(--pink-primary);
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2.5rem;
+            }
+
+            .calculator-card {
+                padding: 2rem 1.5rem;
+            }
+
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .before-after {
+                grid-template-columns: 1fr;
+            }
+
+            .result-value {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">SUPERED</div>
+            <div class="tagline">ROI Calculator</div>
+        </div>
+
+        <div class="calculator-card">
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-icon">📊</span>
+                    Your Numbers
+                </div>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="dealSize">Average Annual Contract Value</label>
+                        <input type="number" id="dealSize" value="50000" placeholder="50000">
+                    </div>
+                    <div class="input-group">
+                        <label for="monthlyLeads">Monthly Leads</label>
+                        <input type="number" id="monthlyLeads" value="100" placeholder="100">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-icon">📈</span>
+                    Conversion Rates
+                </div>
+                <div class="before-after">
+                    <div class="before-after-card">
+                        <div class="before-after-label">Lead → Deal (Before)</div>
+                        <input type="number" id="leadToDealBefore" value="25" placeholder="25" style="background: white; width: 100%; margin-top: 0.5rem;">
+                        <div style="text-align: right; font-size: 1.2rem; font-weight: 700; margin-top: 0.5rem;">%</div>
+                    </div>
+                    <div class="before-after-card" style="border-color: var(--pink-primary);">
+                        <div class="before-after-label" style="color: var(--pink-primary);">Lead → Deal (After)</div>
+                        <input type="number" id="leadToDealAfter" value="30" placeholder="30" style="width: 100%; margin-top: 0.5rem;">
+                        <div style="text-align: right; font-size: 1.2rem; font-weight: 700; margin-top: 0.5rem; color: var(--pink-primary);">%</div>
+                    </div>
+                </div>
+
+                <div class="before-after" style="margin-top: 1rem;">
+                    <div class="before-after-card">
+                        <div class="before-after-label">Deal → Closed (Before)</div>
+                        <input type="number" id="dealToClosedBefore" value="30" placeholder="30" style="background: white; width: 100%; margin-top: 0.5rem;">
+                        <div style="text-align: right; font-size: 1.2rem; font-weight: 700; margin-top: 0.5rem;">%</div>
+                    </div>
+                    <div class="before-after-card" style="border-color: var(--pink-primary);">
+                        <div class="before-after-label" style="color: var(--pink-primary);">Deal → Closed (After)</div>
+                        <input type="number" id="dealToClosedAfter" value="35" placeholder="35" style="width: 100%; margin-top: 0.5rem;">
+                        <div style="text-align: right; font-size: 1.2rem; font-weight: 700; margin-top: 0.5rem; color: var(--pink-primary);">%</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-icon">💰</span>
+                    Investment
+                </div>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="monthlyCost">Monthly Cost of Supered</label>
+                        <input type="number" id="monthlyCost" value="500" placeholder="500">
+                    </div>
+                    <div class="input-group">
+                        <label for="implementationCost">One-Time Implementation Cost</label>
+                        <input type="number" id="implementationCost" value="2000" placeholder="2000">
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <span class="section-icon">🎯</span>
+                    Your Results
+                </div>
+                <div class="results-grid">
+                    <div class="result-card" style="animation-delay: 0.1s;">
+                        <div class="result-label">Additional Monthly Revenue</div>
+                        <div class="result-value" id="monthlyRevenue">$0</div>
+                    </div>
+                    <div class="result-card" style="animation-delay: 0.2s;">
+                        <div class="result-label">ROI</div>
+                        <div class="result-value" id="roi">0%</div>
+                    </div>
+                </div>
+
+                <div class="breakdown-table">
+                    <div class="breakdown-row">
+                        <span class="breakdown-label">Additional Annual Revenue</span>
+                        <span class="breakdown-value" id="annualRevenue">$0</span>
+                    </div>
+                    <div class="breakdown-row">
+                        <span class="breakdown-label">Annual Subscription Cost</span>
+                        <span class="breakdown-value" id="annualCost">$0</span>
+                    </div>
+                    <div class="breakdown-row">
+                        <span class="breakdown-label">Implementation Cost</span>
+                        <span class="breakdown-value" id="implCost">$0</span>
+                    </div>
+                    <div class="breakdown-row" style="padding-top: 1.5rem; margin-top: 1rem; border-top: 2px solid var(--pink-primary);">
+                        <span class="breakdown-label" style="font-size: 1.2rem;">Net First Year Gain</span>
+                        <span class="breakdown-value" id="netGain" style="font-size: 1.5rem;">$0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cta-section">
+                <div class="cta-text">Ready to transform your sales process?</div>
+                <button class="cta-button" onclick="window.location.href='https://supered.com'">Get Started with Supered</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatCurrency(num) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(num);
+        }
+
+        function formatPercent(num) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'percent',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(num);
+        }
+
+        function calculate() {
+            // Get inputs
+            const dealSize = parseFloat(document.getElementById('dealSize').value) || 0;
+            const monthlyLeads = parseFloat(document.getElementById('monthlyLeads').value) || 0;
+            const leadToDealBefore = parseFloat(document.getElementById('leadToDealBefore').value) / 100 || 0;
+            const leadToDealAfter = parseFloat(document.getElementById('leadToDealAfter').value) / 100 || 0;
+            const dealToClosedBefore = parseFloat(document.getElementById('dealToClosedBefore').value) / 100 || 0;
+            const dealToClosedAfter = parseFloat(document.getElementById('dealToClosedAfter').value) / 100 || 0;
+            const monthlyCost = parseFloat(document.getElementById('monthlyCost').value) || 0;
+            const implementationCost = parseFloat(document.getElementById('implementationCost').value) || 0;
+
+            // Calculate before
+            const dealsBefore = monthlyLeads * leadToDealBefore;
+            const closedBefore = dealsBefore * dealToClosedBefore;
+            const revenueBefore = closedBefore * dealSize;
+
+            // Calculate after
+            const dealsAfter = monthlyLeads * leadToDealAfter;
+            const closedAfter = dealsAfter * dealToClosedAfter;
+            const revenueAfter = closedAfter * dealSize;
+
+            // Calculate impact
+            const additionalMonthlyRevenue = revenueAfter - revenueBefore;
+            const additionalAnnualRevenue = additionalMonthlyRevenue * 12;
+            const annualSubscriptionCost = monthlyCost * 12;
+            const totalFirstYearCost = annualSubscriptionCost + implementationCost;
+            const netGain = additionalAnnualRevenue - totalFirstYearCost;
+            const roi = totalFirstYearCost > 0 ? netGain / totalFirstYearCost : 0;
+
+            // Update display
+            document.getElementById('monthlyRevenue').textContent = formatCurrency(additionalMonthlyRevenue);
+            document.getElementById('roi').textContent = formatPercent(roi);
+            document.getElementById('annualRevenue').textContent = formatCurrency(additionalAnnualRevenue);
+            document.getElementById('annualCost').textContent = formatCurrency(annualSubscriptionCost);
+            document.getElementById('implCost').textContent = formatCurrency(implementationCost);
+            document.getElementById('netGain').textContent = formatCurrency(netGain);
+        }
+
+        // Add event listeners
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('input', calculate);
+        });
+
+        // Initial calculation
+        calculate();
+    </script>
+</body>
+</html>
